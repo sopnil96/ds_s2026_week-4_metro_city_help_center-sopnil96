@@ -1,84 +1,121 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/TeyGQAqr)
 
-# Week 3 Homework: The Royal Rail Ledger
+# Weekly Coding #3 — Metro City Help Center
 
 ## Overview
 
-This project implements singly and doubly linked list operations in pure Python (stdlib only).
+This project implements stack and queue data structures in pure Python (stdlib only) to simulate a Metro City Help Center support system.
 
 ## Files
 
-- `src/challenges.py` — All implemented functions and node/list class definitions.
+- `src/challenges.py` — All implemented classes and functions.
 
 ## Data Structures
 
-### `SLLNode` / `SinglyLinkedList`
-A basic singly linked list where each node holds a value and a reference to the next node.
+### `ActionStack`
+A stack of recent help-center actions backed by a Python list. Follows **LIFO** (Last In, First Out) order.
 
-### `DLLNode` / `DoublyLinkedList`
-A doubly linked list where each node holds a value and references to both the previous and next nodes. The list maintains both `head` and `tail` references.
+### `RequestQueue`
+A queue of waiting citizens backed by `collections.deque`. Follows **FIFO** (First In, First Out) order.
 
 ## Implemented Functions
 
-### `build_sll_from_list(values: list[int]) -> SinglyLinkedList`
-Builds and returns a singly linked list from a Python list.
+### `ActionStack.push(action: str) -> None`
+Adds an action to the top of the stack.
 
-### `sll_to_list(sll: SinglyLinkedList) -> list[int]`
-Converts a singly linked list back into a Python list.
+### `ActionStack.pop() -> str | None`
+Removes and returns the top action. Returns `None` if empty.
+- **Time complexity:** O(1) — `list.pop()` from the end is constant time.
 
-### `find_first_repeat_sll(sll: SinglyLinkedList) -> int | None`
-Traverses the singly linked list from left to right and returns the first value that appears more than once. Returns `None` if no duplicates exist.
+### `ActionStack.peek() -> str | None`
+Returns the top action without removing it. Returns `None` if empty.
 
-- **Time complexity:** O(n)
-- **Space complexity:** O(n)
-- Uses a `set` to track seen values.
+### `ActionStack.is_empty() -> bool`
+Returns `True` if the stack has no actions.
 
-### `remove_all_from_dll(dll: DoublyLinkedList, target: int) -> None`
-Removes all nodes from the doubly linked list whose value equals `target`. Correctly updates `head`, `tail`, and all `prev`/`next` pointers in-place.
+### `RequestQueue.enqueue(name: str) -> None`
+Adds a citizen name to the back of the queue.
 
-### `is_train_palindrome(dll: DoublyLinkedList) -> bool` *(Stretch)*
-Returns `True` if the doubly linked list reads the same forward and backward. Uses a two-pointer approach starting from `head` and `tail`, meeting in the middle.
+### `RequestQueue.dequeue() -> str | None`
+Removes and returns the front citizen. Returns `None` if empty.
+- **Time complexity:** O(1) — `deque.popleft()` is constant time.
 
-- Handles even and odd length lists correctly.
-- Returns `True` for an empty list.
+### `RequestQueue.peek() -> str | None`
+Returns the front citizen without removing it. Returns `None` if empty.
+
+### `RequestQueue.is_empty() -> bool`
+Returns `True` if the queue has no waiting citizens.
+
+### `is_note_balanced(note: str) -> bool`
+Returns `True` if all `()`, `[]`, and `{}` brackets in the note are correctly balanced.
+- **Time complexity:** O(n) — visits each character once.
+
+### `process_request_line(citizens: list[str]) -> list[str]`
+Returns citizens in the order they are served (FIFO).
+- **Time complexity:** O(n) — enqueues and dequeues each citizen once.
+
+### `undo_recent_actions(actions: list[str], undo_count: int) -> list[str]` *(Stretch)*
+Removes the most recent `undo_count` actions and returns the remaining list.
+
+## Edge Cases Handled
+
+- Empty action stack — `pop()` and `peek()` return `None`
+- Empty request queue — `dequeue()` and `peek()` return `None`
+- Empty string for `is_note_balanced` — returns `True`
+- Note with no brackets — returns `True`
+- Empty citizen list — returns `[]`
 
 ## Example Usage
 
 ```python
 from src.challenges import (
-    build_sll_from_list,
-    sll_to_list,
-    find_first_repeat_sll,
-    remove_all_from_dll,
-    is_train_palindrome,
-    DoublyLinkedList,
-    DLLNode,
+    ActionStack,
+    RequestQueue,
+    is_note_balanced,
+    process_request_line,
+    undo_recent_actions,
 )
 
-# Singly linked list
-sll = build_sll_from_list([1, 2, 3, 2, 4])
-print(sll_to_list(sll))           # [1, 2, 3, 2, 4]
-print(find_first_repeat_sll(sll)) # 2
+# Stack
+stack = ActionStack()
+stack.push("open ticket")
+stack.push("assign agent")
+print(stack.pop())   # assign agent
+print(stack.peek())  # open ticket
 
-# Doubly linked list - remove all
-dll = DoublyLinkedList()
-dll.head = DLLNode(1)
-dll.head.next = DLLNode(2, prev=dll.head)
-dll.head.next.next = DLLNode(1, prev=dll.head.next)
-dll.tail = dll.head.next.next
-remove_all_from_dll(dll, 1)
-# dll now contains only: [2]
+# Queue
+queue = RequestQueue()
+queue.enqueue("Alice")
+queue.enqueue("Bob")
+print(queue.dequeue())  # Alice
 
-# Palindrome check
-dll2 = DoublyLinkedList()
-dll2.head = DLLNode(1)
-dll2.head.next = DLLNode(2, prev=dll2.head)
-dll2.head.next.next = DLLNode(1, prev=dll2.head.next)
-dll2.tail = dll2.head.next.next
-print(is_train_palindrome(dll2))  # True
+# Balanced brackets
+print(is_note_balanced("(hello [world])"))  # True
+print(is_note_balanced("(hello [world)"))   # False
+
+# Process line
+print(process_request_line(["Alice", "Bob", "Charlie"]))  # ['Alice', 'Bob', 'Charlie']
+
+# Undo actions
+print(undo_recent_actions(["a", "b", "c"], 2))  # ['a']
 ```
+
+## Complexity Summary
+
+| Function | Time | Why |
+|---|---|---|
+| `ActionStack.pop` | O(1) | `list.pop()` from the end is constant time |
+| `RequestQueue.dequeue` | O(1) | `deque.popleft()` is constant time |
+| `is_note_balanced` | O(n) | visits each character once |
+| `process_request_line` | O(n) | enqueues and dequeues each citizen once |
 
 ## Requirements
 
 - Python 3.10+
 - No third-party libraries (stdlib only)
+
+## Assistance & Sources
+
+- AI used? Y
+- What it helped with: Implementation guidance and complexity analysis
+- Other sources: Python docs (collections.deque)
